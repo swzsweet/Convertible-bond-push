@@ -16,7 +16,7 @@
 
 | 变量 | 必填 | 默认值 | 说明 |
 |------|------|--------|------|
-| `BARK_BASE` | 是 | - | Bark 地址，形如 `https://api.day.app/你的key` |
+| `BARK_BASE` | 是 | - | Bark 地址，形如 `https://api.day.app/你的key`；支持多个，用逗号分隔，会逐个推送 |
 | `BARK_GROUP` | 否 | `可转债` | Bark 推送分组 |
 | `PUSH_TIME` | 否 | `09:00` | 每天推送时间 HH:MM（北京时间） |
 | `NOTIFY_WHEN_EMPTY` | 否 | `false` | 无可申购时是否也推送一条提示 |

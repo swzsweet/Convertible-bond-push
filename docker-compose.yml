@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     environment:
       # 配置项从同目录的 .env 文件读取（参考 .env.example）
-      # 必填：Bark 推送地址，形如 https://api.day.app/你的key
+      # 必填：Bark 推送地址，形如 https://api.day.app/你的key（多个用逗号分隔）
       - BARK_BASE=${BARK_BASE}
       # 选填：Bark 分组
       - BARK_GROUP=${BARK_GROUP:-可转债}

@@ -7,6 +7,7 @@
 """
 
 import os
+import re
 import sys
 import time
 import logging
@@ -26,7 +27,13 @@ EASTMONEY_API = "https://datacenter-web.eastmoney.com/api/data/v1/get"
 
 # ---- 配置（环境变量）----
 # BARK_BASE 形如 https://api.day.app/your_key  （末尾不带斜杠也可）
-BARK_BASE = os.environ.get("BARK_BASE", "").rstrip("/")
+# 支持多个地址，用逗号或分号分隔，会逐个推送
+def _parse_bases(raw: str):
+    parts = re.split(r"[,;\s]+", raw.strip())
+    return [p.rstrip("/") for p in parts if p.strip()]
+
+
+BARK_BASES = _parse_bases(os.environ.get("BARK_BASE", ""))
 BARK_GROUP = os.environ.get("BARK_GROUP", "可转债")
 # 推送时间，HH:MM，默认 09:00
 PUSH_TIME = os.environ.get("PUSH_TIME", "09:00")
@@ -98,24 +105,32 @@ def build_message(bonds):
     return title, body
 
 
-def push_bark(title: str, body: str, copy_text: str = ""):
-    """通过 Bark 推送。"""
-    if not BARK_BASE:
-        log.error("未配置 BARK_BASE，无法推送。")
-        return False
+def _push_one(base: str, title: str, body: str, copy_text: str = ""):
+    """向单个 Bark 地址推送。"""
     # Bark URL: /<key>/<title>/<body>
-    url = f"{BARK_BASE}/{quote(title)}/{quote(body)}"
+    url = f"{base}/{quote(title)}/{quote(body)}"
     params = {"group": BARK_GROUP}
     if copy_text:
         params["copy"] = copy_text
     try:
         resp = requests.get(url, params=params, timeout=REQUEST_TIMEOUT)
         resp.raise_for_status()
-        log.info("推送成功: %s", title)
+        log.info("推送成功 -> %s : %s", base, title)
         return True
     except requests.RequestException as e:
-        log.error("推送失败: %s", e)
+        log.error("推送失败 -> %s : %s", base, e)
         return False
+
+
+def push_bark(title: str, body: str, copy_text: str = ""):
+    """通过 Bark 推送，支持多个地址，逐个发送。"""
+    if not BARK_BASES:
+        log.error("未配置 BARK_BASE，无法推送。")
+        return False
+    results = [_push_one(base, title, body, copy_text) for base in BARK_BASES]
+    ok = sum(results)
+    log.info("推送完成: %d/%d 成功", ok, len(results))
+    return any(results)
 
 
 def run_once():
