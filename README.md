@@ -24,7 +24,13 @@
 
 ## Docker 部署（推荐）
 
-1. 编辑 `docker-compose.yml`，把 `BARK_BASE` 改成你自己的 Bark 地址。
+1. 复制配置模板并填入你自己的 Bark 地址：
+
+```bash
+cp .env.example .env
+# 编辑 .env，把 BARK_BASE 改成你的 https://api.day.app/你的key
+```
+
 2. 启动：
 
 ```bash
@@ -38,6 +44,8 @@ docker compose logs -f
 ```
 
 容器时区已设为 `Asia/Shanghai`，每天到 `PUSH_TIME` 自动执行。
+
+> `.env` 已在 `.gitignore` 中忽略，不会被提交，密钥不会泄露。
 
 ## 本地运行
 
