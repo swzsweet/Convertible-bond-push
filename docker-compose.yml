@@ -1,0 +1,15 @@
+services:
+  cb-push:
+    build: .
+    image: cb-push:latest
+    container_name: cb-push
+    restart: unless-stopped
+    environment:
+      # 必填：Bark 推送地址，形如 https://api.day.app/你的key
+      - BARK_BASE=https://api.day.app/你的key/
+      # 选填：Bark 分组
+      - BARK_GROUP=可转债
+      # 选填：每天推送时间 HH:MM（容器时区为 Asia/Shanghai）
+      - PUSH_TIME=09:00
+      # 选填：无可申购时是否也推送一条提示
+      - NOTIFY_WHEN_EMPTY=false
